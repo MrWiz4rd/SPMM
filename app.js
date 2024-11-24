@@ -1,71 +1,71 @@
-// Importovanie funkcií z WebRTC API (alebo iných knižníc, ak sú potrebné)
-import { RTCPeerConnection, RTCSessionDescription } from "webrtc-adapter";
-
-// ICE konfigurácia
-const iceConfig = {
-    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-};
+const localVideo = document.getElementById('local-video');
+const remoteVideo = document.getElementById('remote-video');
+const startCallButton = document.getElementById('start-call');
+const joinCallButton = document.getElementById('join-call');
+const localOfferTextarea = document.getElementById('local-offer');
+const remoteOfferTextarea = document.getElementById('remote-offer');
+const setRemoteOfferButton = document.getElementById('set-remote-offer');
 
 let localStream;
 let peerConnection;
 
-// Načítanie lokálneho streamu
+const iceConfig = {
+    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+};
+
+// Získanie lokálneho video/audio streamu
 navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     .then((stream) => {
         localStream = stream;
-        document.getElementById('local-video').srcObject = stream;
+        localVideo.srcObject = stream;
     })
-    .catch((error) => {
-        console.error('Chyba pri prístupe ku kamere/mikrofónu:', error);
-        alert('Nie je možné pristúpiť ku kamere/mikrofónu.');
-    });
+    .catch((error) => console.error('Chyba pri získaní streamu:', error));
 
-// Tvorba Peer-to-Peer spojenia
+// Vytvorenie PeerConnection
 function createPeerConnection() {
     peerConnection = new RTCPeerConnection(iceConfig);
 
     // Pridanie lokálnych stôp
     localStream.getTracks().forEach((track) => peerConnection.addTrack(track, localStream));
 
-    // Prijatie vzdialených stôp
+    // Prijatie vzdialeného streamu
     peerConnection.ontrack = (event) => {
-        document.getElementById('remote-video').srcObject = event.streams[0];
+        remoteVideo.srcObject = event.streams[0];
     };
 
     // ICE kandidáti
     peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
-            console.log("ICE kandidát odoslaný:", event.candidate);
+            console.log('Nový ICE kandidát:', JSON.stringify(event.candidate));
         }
     };
 }
 
-// Pripojenie k hovoru
-document.getElementById('start-call').addEventListener('click', () => {
+// Začať hovor
+startCallButton.addEventListener('click', async () => {
     createPeerConnection();
 
-    peerConnection.createOffer()
-        .then((offer) => {
-            return peerConnection.setLocalDescription(offer);
-        })
-        .then(() => {
-            console.log("Ponuka vytvorená:", peerConnection.localDescription);
-        })
-        .catch((error) => console.error('Chyba pri vytváraní ponuky:', error));
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+
+    localOfferTextarea.value = JSON.stringify(peerConnection.localDescription);
 });
 
-document.getElementById('join-call').addEventListener('click', () => {
+// Pripojiť sa k hovoru
+joinCallButton.addEventListener('click', async () => {
     createPeerConnection();
 
-    // Prijatie ponuky (príklad, kde by sa načítala ponuka zo servera)
-    const offer = {/* Načítaná ponuka */};
-    peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
-        .then(() => peerConnection.createAnswer())
-        .then((answer) => {
-            return peerConnection.setLocalDescription(answer);
-        })
-        .then(() => {
-            console.log("Odpoveď vytvorená:", peerConnection.localDescription);
-        })
-        .catch((error) => console.error('Chyba pri prijímaní ponuky:', error));
+    const remoteOffer = JSON.parse(remoteOfferTextarea.value);
+    await peerConnection.setRemoteDescription(remoteOffer);
+
+    const answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
+
+    localOfferTextarea.value = JSON.stringify(peerConnection.localDescription);
+});
+
+// Nastaviť remote offer
+setRemoteOfferButton.addEventListener('click', async () => {
+    const remoteOffer = JSON.parse(remoteOfferTextarea.value);
+    await peerConnection.setRemoteDescription(remoteOffer);
 });
