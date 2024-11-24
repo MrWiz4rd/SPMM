@@ -88,10 +88,3 @@ video {
     justify-content: center;
     align-items: center;
 }
-
-/* Ikona vo vnútri tlačidla ukončenia hovoru */
-.red-background i {
-    color: white;      /* Biela farba pre ikonu */
-    font-size: 1.5em;  /* Veľkosť ikony */
-    line-height: 1;
-}
