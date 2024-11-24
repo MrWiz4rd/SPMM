@@ -1,18 +1,14 @@
-// Výber tlačidiel
-const muteBtn = document.getElementById('mute-btn');
-const muteIcon = document.getElementById('mute-icon');
-const cameraBtn = document.getElementById('camera-btn');
-const cameraIcon = document.getElementById('camera-icon');
-const hangupBtn = document.getElementById('hangup-btn');
-
 const localVideo = document.getElementById('local-video');
 const remoteVideo = document.getElementById('remote-video');
+const offerInput = document.getElementById('offer-input');
+const answerInput = document.getElementById('answer-input');
+const copyOfferButton = document.getElementById('copy-offer-btn');
+const copyAnswerButton = document.getElementById('copy-answer-btn');
+const createOfferButton = document.getElementById('create-offer-btn');
+const setAnswerButton = document.getElementById('set-answer-btn');
 
 let localStream;
 let peerConnection;
-
-// Signalizačný server
-const socket = io();
 
 // ICE konfigurácia
 const iceConfig = {
@@ -24,104 +20,74 @@ navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     .then((stream) => {
         localStream = stream;
         localVideo.srcObject = stream;
-
-        // Obsluha tlačidiel po získaní streamu
-        setupButtons();
     })
     .catch((error) => {
         console.error('Chyba pri prístupe ku kamere/mikrofónu:', error);
     });
 
-// Signalizácia
-socket.on('offer', async (offer) => {
+// Vytvorenie peer-to-peer spojenia
+function createPeerConnection() {
     peerConnection = new RTCPeerConnection(iceConfig);
 
+    // Počas prijatia médií zo vzdialeného klienta
     peerConnection.ontrack = (event) => {
         remoteVideo.srcObject = event.streams[0];
     };
 
+    // Odosielanie lokálneho streamu
     localStream.getTracks().forEach((track) => {
         peerConnection.addTrack(track, localStream);
     });
 
+    // Odosielanie ICE kandidátov (do konzoly alebo iného kanála)
+    peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+            console.log('Nový ICE kandidat:', event.candidate);
+        }
+    };
+}
+
+// Tvorba ponuky (offer)
+createOfferButton.addEventListener('click', async () => {
+    createPeerConnection();
+
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+
+    console.log('Vytvorená ponuka:', offer);
+    offerInput.value = JSON.stringify(offer);
+});
+
+// Nastavenie odpovede (answer)
+setAnswerButton.addEventListener('click', async () => {
+    const answer = JSON.parse(answerInput.value);
+    await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+    console.log('Nastavená odpoveď:', answer);
+});
+
+// Prijatie ponuky a vytvorenie odpovede
+offerInput.addEventListener('change', async () => {
+    createPeerConnection();
+
+    const offer = JSON.parse(offerInput.value);
     await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
 
-    socket.emit('answer', answer);
+    console.log('Vytvorená odpoveď:', answer);
+    answerInput.value = JSON.stringify(answer);
 });
 
-socket.on('answer', async (answer) => {
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+// Kopírovanie ponuky alebo odpovede
+copyOfferButton.addEventListener('click', () => {
+    offerInput.select();
+    document.execCommand('copy');
+    alert('Ponuka skopírovaná!');
 });
 
-socket.on('candidate', async (candidate) => {
-    await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+copyAnswerButton.addEventListener('click', () => {
+    answerInput.select();
+    document.execCommand('copy');
+    alert('Odpoveď skopírovaná!');
 });
-
-// Vytváranie spojenia
-document.addEventListener('DOMContentLoaded', () => {
-    peerConnection = new RTCPeerConnection(iceConfig);
-
-    peerConnection.ontrack = (event) => {
-        remoteVideo.srcObject = event.streams[0];
-    };
-
-    localStream.getTracks().forEach((track) => {
-        peerConnection.addTrack(track, localStream);
-    });
-
-    peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
-            socket.emit('candidate', event.candidate);
-        }
-    };
-
-    peerConnection.createOffer()
-        .then((offer) => {
-            peerConnection.setLocalDescription(offer);
-            socket.emit('offer', offer);
-        })
-        .catch((error) => console.error(error));
-});
-
-// Funkcia na nastavenie tlačidiel
-function setupButtons() {
-    // Prepínanie mikrofónu
-    muteBtn.addEventListener('click', () => {
-        const audioTrack = localStream.getAudioTracks()[0];
-        if (audioTrack) {
-            audioTrack.enabled = !audioTrack.enabled;
-
-            // Prepnutie ikon a stavu tlačidla
-            muteIcon.classList.toggle('fa-microphone', audioTrack.enabled);
-            muteIcon.classList.toggle('fa-microphone-slash', !audioTrack.enabled);
-            muteBtn.classList.toggle('active', audioTrack.enabled);
-            muteBtn.classList.toggle('inactive', !audioTrack.enabled);
-        }
-    });
-
-    // Prepínanie kamery
-    cameraBtn.addEventListener('click', () => {
-        const videoTrack = localStream.getVideoTracks()[0];
-        if (videoTrack) {
-            videoTrack.enabled = !videoTrack.enabled;
-
-            // Prepnutie ikon a stavu tlačidla
-            cameraIcon.classList.toggle('fa-video', videoTrack.enabled);
-            cameraIcon.classList.toggle('fa-video-slash', !videoTrack.enabled);
-            cameraBtn.classList.toggle('active', videoTrack.enabled);
-            cameraBtn.classList.toggle('inactive', !videoTrack.enabled);
-        }
-    });
-
-    // Ukončenie hovoru
-    hangupBtn.addEventListener('click', () => {
-        if (localStream) {
-            localStream.getTracks().forEach((track) => track.stop());
-            localVideo.srcObject = null;
-            remoteVideo.srcObject = null;
-            alert('Hovor bol ukončený.');
-        }
-    });
-}
