@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webkonferencia</title>
     <link rel="stylesheet" href="styles.css">
+
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"></script>
 </head>
@@ -12,12 +14,10 @@
     <div class="container">
         <h1 class="title">Webkonferencia</h1>
         <div class="video-container">
-            <!-- Video prvého používateľa -->
             <div class="webcam-frame">
                 <video id="local-video" autoplay playsinline></video>
                 <div id="local-video-text" class="webcam-text">Váš obraz</div>
             </div>
-            <!-- Video druhého používateľa -->
             <div class="webcam-frame">
                 <video id="remote-video" autoplay playsinline></video>
                 <div id="remote-video-text" class="webcam-text">Pripojený účastník</div>
@@ -28,6 +28,8 @@
             <button id="join-call" class="control-button">Pripojiť sa k hovoru</button>
         </div>
     </div>
+
+    <!-- Váš JavaScript -->
     <script src="app.js"></script>
 </body>
 </html>
