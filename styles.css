@@ -1,11 +1,11 @@
-/* Základné štýly stránky */
+/* Štýly pre celú stránku */
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column; /* Usporiadanie obsahu v stĺpci */
+    flex-direction: column;
     height: 100vh;
     margin: 0;
 }
@@ -24,14 +24,14 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 40px; /* Väčšia medzera medzi videami */
-    margin-bottom: 20px; /* Priestor medzi videami a tlačidlami */
+    gap: 20px; /* Medzery medzi videami */
+    margin-bottom: 20px;
 }
 
 /* Rám pre webkameru */
 .webcam-frame {
-    width: 480px; /* Zvýšená šírka okien */
-    height: 360px; /* Zvýšená výška okien */
+    width: 480px;
+    height: 360px;
     border: 5px solid #007bff;
     position: relative;
     display: flex;
@@ -49,7 +49,7 @@ video {
 .webcam-text {
     position: absolute;
     color: white;
-    font-size: 1.5em;
+    font-size: 1.2em;
     text-align: center;
     display: flex;
     justify-content: center;
@@ -59,46 +59,24 @@ video {
     pointer-events: none;
 }
 
-/* Ovládacie tlačidlá */
+/* Tlačidlá */
 .controls {
     display: flex;
     justify-content: center;
-    gap: 20px; /* Väčšie medzery medzi tlačidlami */
-    margin-top: 20px; /* Posunutie tlačidiel nižšie */
+    gap: 15px;
 }
 
 .control-button {
+    background-color: #007bff;
+    color: white;
     border: none;
-    border-radius: 10%; /* Mierne zaoblenie */
-    width: 70px;
-    height: 70px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.5em;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1em;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: background-color 0.3s;
 }
 
-/* Modré pozadie pre aktívne tlačidlá */
-.control-button.active {
-    background-color: #007bff; /* Svetlomodrá */
-    color: white;
-}
-
-/* Červené pozadie pre neaktívne tlačidlá */
-.control-button.inactive {
-    background-color: #dc3545; /* Červená */
-    color: white;
-}
-
-/* Tlačidlo na ukončenie hovoru */
-.red-background {
-    background-color: #dc3545; /* Červené pozadie */
-    border-radius: 10%; /* Mierne zaoblenie */
-    width: 70px;
-    height: 70px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.control-button:hover {
+    background-color: #0056b3;
 }
