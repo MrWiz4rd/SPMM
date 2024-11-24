@@ -1,81 +1,71 @@
-const localVideo = document.getElementById('local-video');
-const remoteVideo = document.getElementById('remote-video');
+// Importovanie funkcií z WebRTC API (alebo iných knižníc, ak sú potrebné)
+import { RTCPeerConnection, RTCSessionDescription } from "webrtc-adapter";
 
-const startCallBtn = document.getElementById('start-call');
-const joinCallBtn = document.getElementById('join-call');
-
-const ws = new WebSocket('ws://localhost:3000');
-let localStream;
-let peerConnection;
-
-// ICE konfigurácia pre WebRTC
+// ICE konfigurácia
 const iceConfig = {
     iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
 };
 
-// Inicializácia lokálneho streamu
+let localStream;
+let peerConnection;
+
+// Načítanie lokálneho streamu
 navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     .then((stream) => {
         localStream = stream;
-        localVideo.srcObject = stream;
+        document.getElementById('local-video').srcObject = stream;
     })
     .catch((error) => {
         console.error('Chyba pri prístupe ku kamere/mikrofónu:', error);
-        alert('Nie je možné pristúpiť ku kamere/mikrofónu. Povolenie je potrebné.');
+        alert('Nie je možné pristúpiť ku kamere/mikrofónu.');
     });
 
-// Inicializácia Peer-to-Peer spojenia
-function initializePeerConnection() {
+// Tvorba Peer-to-Peer spojenia
+function createPeerConnection() {
     peerConnection = new RTCPeerConnection(iceConfig);
 
     // Pridanie lokálnych stôp
-    localStream.getTracks().forEach((track) => {
-        peerConnection.addTrack(track, localStream);
-    });
+    localStream.getTracks().forEach((track) => peerConnection.addTrack(track, localStream));
 
     // Prijatie vzdialených stôp
     peerConnection.ontrack = (event) => {
-        remoteVideo.srcObject = event.streams[0];
+        document.getElementById('remote-video').srcObject = event.streams[0];
     };
 
-    // Odosielanie ICE kandidátov
+    // ICE kandidáti
     peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
-            ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
+            console.log("ICE kandidát odoslaný:", event.candidate);
         }
     };
 }
 
-// Vytvorenie ponuky (offer)
-startCallBtn.addEventListener('click', () => {
-    initializePeerConnection();
+// Pripojenie k hovoru
+document.getElementById('start-call').addEventListener('click', () => {
+    createPeerConnection();
 
     peerConnection.createOffer()
         .then((offer) => {
-            peerConnection.setLocalDescription(offer);
-            ws.send(JSON.stringify({ type: 'offer', offer }));
+            return peerConnection.setLocalDescription(offer);
+        })
+        .then(() => {
+            console.log("Ponuka vytvorená:", peerConnection.localDescription);
         })
         .catch((error) => console.error('Chyba pri vytváraní ponuky:', error));
 });
 
-// Pripojenie k hovoru (prijatie ponuky)
-joinCallBtn.addEventListener('click', () => {
-    initializePeerConnection();
-    ws.addEventListener('message', (message) => {
-        const data = JSON.parse(message.data);
+document.getElementById('join-call').addEventListener('click', () => {
+    createPeerConnection();
 
-        if (data.type === 'offer') {
-            peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer))
-                .then(() => peerConnection.createAnswer())
-                .then((answer) => {
-                    peerConnection.setLocalDescription(answer);
-                    ws.send(JSON.stringify({ type: 'answer', answer }));
-                })
-                .catch((error) => console.error('Chyba pri prijímaní ponuky:', error));
-        } else if (data.type === 'answer') {
-            peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-        } else if (data.type === 'candidate') {
-            peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
-        }
-    });
+    // Prijatie ponuky (príklad, kde by sa načítala ponuka zo servera)
+    const offer = {/* Načítaná ponuka */};
+    peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
+        .then(() => peerConnection.createAnswer())
+        .then((answer) => {
+            return peerConnection.setLocalDescription(answer);
+        })
+        .then(() => {
+            console.log("Odpoveď vytvorená:", peerConnection.localDescription);
+        })
+        .catch((error) => console.error('Chyba pri prijímaní ponuky:', error));
 });
