@@ -9,19 +9,41 @@ const remoteVideo = document.getElementById('remote-webcam');
 let localStream;
 let peerConnection;
 
-// WebRTC konfigurácia
 const config = {
-    iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' } // STUN server
-    ]
+    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] // STUN server
 };
 
-// Po pripojení k serveru
-socket.on('connect', () => {
-    console.log('Pripojený k serveru');
-});
+// Získanie prístupu ku kamere a mikrofónu
+navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    .then((stream) => {
+        localStream = stream;
+        localVideo.srcObject = stream;
 
-// Po prijatí signalizačnej správy
+        if (!peerConnection) createPeerConnection();
+        localStream.getTracks().forEach((track) => peerConnection.addTrack(track, localStream));
+    })
+    .catch((error) => {
+        console.error('Chyba pri prístupe ku kamere alebo mikrofónu:', error);
+        alert('Kamera alebo mikrofón neboli povolené.');
+    });
+
+// Vytvorenie PeerConnection
+function createPeerConnection() {
+    peerConnection = new RTCPeerConnection(config);
+
+    peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+            socket.emit('signal', { candidate: event.candidate });
+        }
+    };
+
+    peerConnection.ontrack = (event) => {
+        remoteVideo.srcObject = event.streams[0];
+        document.getElementById('remote-webcam-text').style.display = 'none';
+    };
+}
+
+// Signalizácia
 socket.on('signal', async (data) => {
     if (!peerConnection) createPeerConnection();
 
@@ -40,40 +62,6 @@ socket.on('signal', async (data) => {
         await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
     }
 });
-
-// Získanie prístupu ku kamere a mikrofónu
-navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-    .then((stream) => {
-        localStream = stream;
-        localVideo.srcObject = stream;
-
-        // Pripojenie streamu k peerConnection
-        if (!peerConnection) createPeerConnection();
-        localStream.getTracks().forEach((track) => peerConnection.addTrack(track, localStream));
-    })
-    .catch((error) => {
-        console.error('Chyba pri prístupe ku kamere alebo mikrofónu:', error);
-        alert('Kamera alebo mikrofón neboli povolené.');
-    });
-
-// Vytvorenie peerConnection
-function createPeerConnection() {
-    peerConnection = new RTCPeerConnection(config);
-
-    peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
-            socket.emit('signal', { candidate: event.candidate });
-        }
-    };
-
-    peerConnection.ontrack = (event) => {
-        remoteVideo.srcObject = event.streams[0];
-        document.getElementById('remote-webcam-text').style.display = 'none';
-    };
-}
-
-// Iniciovanie hovoru
-socket.emit('ready');
 
 // Ukončenie hovoru
 hangupBtn.addEventListener('click', () => {
