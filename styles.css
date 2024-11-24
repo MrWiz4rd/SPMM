@@ -54,46 +54,44 @@ video {
 
 .control-button {
     border: none;
-    border-radius: 5px;
+    border-radius: 10%; /* Mierne zaoblenie */
     width: 70px;
     height: 70px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0 10px;
-    cursor: pointer;
     font-size: 1.5em;
-    transition: background-color 0.3s;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
-/* Farby pre ikony */
-.control-button i {
-    color: white; /* Explicitne nastavíme farbu ikon na bielu */
-}
-
-/* Aktívny (zelený) stav */
+/* Modré pozadie pre aktívne tlačidlá */
 .control-button.active {
-    background-color: #28a745; /* Zelené pozadie */
+    background-color: #007bff; /* Svetlomodrá */
+    color: white;
 }
 
-/* Neaktívny (červený) stav */
+/* Červené pozadie pre neaktívne tlačidlá */
 .control-button.inactive {
-    background-color: #dc3545; /* Červené pozadie */
+    background-color: #dc3545; /* Červená */
+    color: white;
 }
 
+/* Zmenšenie tlačidla na ukončenie hovoru */
 .red-background {
+    border-radius: 10%; /* Mierne zaoblenie */
+    width: 70px;       /* Rovnaká šírka ako ostatné tlačidlá */
+    height: 70px;      /* Rovnaká výška ako ostatné tlačidlá */
     background-color: red;
-    border-radius: 5px;
-    padding: 10px;
     display: flex;
     justify-content: center;
+    align-items: center;
 }
 
-.transparent-background {
-    background-color: transparent;
-    border: none;
-}
-
-.white-icon {
+/* Farba a štýl ikon */
+.control-button i,
+.red-background i {
+    font-size: 1.5em; /* Zabezpečí rovnakú veľkosť ikon */
     color: white;
+    line-height: 1;
 }
