@@ -1,11 +1,8 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// Importy potrebné pre Firebase verziu 9+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+import { getDatabase, ref, set, onValue, push } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Firebase konfigurácia
 const firebaseConfig = {
   apiKey: "AIzaSyAx6FWn6zc36lnMcnk8aYYH4FvCxcIrC6o",
   authDomain: "spmm-a8fa5.firebaseapp.com",
@@ -16,13 +13,14 @@ const firebaseConfig = {
   measurementId: "G-2K3YFBQKGE"
 };
 
-// Initialize Firebase
+// Inicializácia Firebase aplikácie a databázy
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const database = getDatabase(app);
+
 // Referencie pre signalizáciu
-const offerRef = database.ref('/offer');
-const answerRef = database.ref('/answer');
-const candidatesRef = database.ref('/candidates');
+const offerRef = ref(database, '/offer');
+const answerRef = ref(database, '/answer');
+const candidatesRef = ref(database, '/candidates');
 
 // Výber prvkov z DOM
 const localVideo = document.getElementById('local-video');
@@ -46,7 +44,7 @@ navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     .then((stream) => {
         localStream = stream;
         localVideo.srcObject = stream;
-        setupButtons();
+        setupButtons(); // Nastavenie funkcií tlačidiel po získaní streamu
     })
     .catch((error) => {
         console.error('Chyba pri prístupe ku kamere/mikrofónu:', error);
@@ -70,26 +68,26 @@ function initializePeerConnection() {
     // Odosielanie ICE kandidátov
     peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
-            candidatesRef.push(JSON.stringify(event.candidate));
+            push(candidatesRef, JSON.stringify(event.candidate));
         }
     };
 }
 
 // Tvorba ponuky (offer)
-function createOffer() {
+document.getElementById('start-call').addEventListener('click', () => {
     initializePeerConnection();
 
     peerConnection.createOffer()
         .then((offer) => {
             peerConnection.setLocalDescription(offer);
-            offerRef.set(JSON.stringify(offer));
+            set(offerRef, JSON.stringify(offer));
         })
         .catch((error) => console.error('Chyba pri vytváraní ponuky:', error));
-}
+});
 
 // Prijatie ponuky a vytvorenie odpovede
-function listenForOffer() {
-    offerRef.on('value', (snapshot) => {
+document.getElementById('join-call').addEventListener('click', () => {
+    onValue(offerRef, (snapshot) => {
         const offer = snapshot.val();
         if (!offer) return;
 
@@ -99,33 +97,30 @@ function listenForOffer() {
             .then(() => peerConnection.createAnswer())
             .then((answer) => {
                 peerConnection.setLocalDescription(answer);
-                answerRef.set(JSON.stringify(answer));
+                set(answerRef, JSON.stringify(answer));
             })
             .catch((error) => console.error('Chyba pri spracovaní ponuky:', error));
     });
-}
 
-// Prijatie odpovede
-function listenForAnswer() {
-    answerRef.on('value', (snapshot) => {
+    onValue(answerRef, (snapshot) => {
         const answer = snapshot.val();
         if (!answer) return;
 
         peerConnection.setRemoteDescription(new RTCSessionDescription(JSON.parse(answer)));
     });
-}
 
-// Prijatie ICE kandidátov
-function listenForCandidates() {
-    candidatesRef.on('child_added', (snapshot) => {
-        const candidate = JSON.parse(snapshot.val());
-        peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
-            .catch((error) => console.error('Chyba pri pridávaní ICE kandidáta:', error));
+    onValue(candidatesRef, (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+            const candidate = JSON.parse(childSnapshot.val());
+            peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+                .catch((error) => console.error('Chyba pri pridávaní ICE kandidáta:', error));
+        });
     });
-}
+});
 
 // Nastavenie funkcií tlačidiel
 function setupButtons() {
+    // Prepínanie mikrofónu
     muteBtn.addEventListener('click', () => {
         const audioTrack = localStream.getAudioTracks()[0];
         if (audioTrack) {
@@ -135,6 +130,7 @@ function setupButtons() {
         }
     });
 
+    // Prepínanie kamery
     cameraBtn.addEventListener('click', () => {
         const videoTrack = localStream.getVideoTracks()[0];
         if (videoTrack) {
@@ -144,6 +140,7 @@ function setupButtons() {
         }
     });
 
+    // Ukončenie hovoru
     hangupBtn.addEventListener('click', () => {
         if (localStream) {
             localStream.getTracks().forEach((track) => track.stop());
@@ -153,11 +150,3 @@ function setupButtons() {
         }
     });
 }
-
-// Tlačidlá na začatie/pripojenie hovoru
-document.getElementById('start-call').addEventListener('click', createOffer);
-document.getElementById('join-call').addEventListener('click', () => {
-    listenForOffer();
-    listenForAnswer();
-    listenForCandidates();
-});
