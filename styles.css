@@ -50,7 +50,7 @@ video {
 .controls {
     display: flex;
     justify-content: center;
-    gap: 15px; /* Pridáme medzery medzi tlačidlá */
+    gap: 15px; /* Medzery medzi tlačidlami */
 }
 
 .control-button {
@@ -83,7 +83,7 @@ video {
     border-radius: 10%; /* Mierne zaoblenie */
     width: 70px;       /* Rovnaká šírka ako ostatné tlačidlá */
     height: 70px;      /* Rovnaká výška ako ostatné tlačidlá */
-    background-color: red;
+    background-color: #dc3545; /* Červené pozadie */
     display: flex;
     justify-content: center;
     align-items: center;
