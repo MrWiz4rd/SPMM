@@ -83,16 +83,15 @@ video {
     border-radius: 10%; /* Mierne zaoblenie */
     width: 70px;       /* Rovnaká šírka ako ostatné tlačidlá */
     height: 70px;      /* Rovnaká výška ako ostatné tlačidlá */
-    background-color: #dc3545; /* Červené pozadie */
+    background-color: #dc3545 !important; /* Červené pozadie s prioritou */
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* Farba a štýl ikon */
-.control-button i,
+/* Ikona vo vnútri tlačidla ukončenia hovoru */
 .red-background i {
-    font-size: 1.5em; /* Zabezpečí rovnakú veľkosť ikon */
-    color: white;
+    color: white;      /* Biela farba pre ikonu */
+    font-size: 1.5em;  /* Veľkosť ikony */
     line-height: 1;
 }
