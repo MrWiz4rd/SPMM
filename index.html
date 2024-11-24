@@ -5,11 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webkonferencia</title>
     <link rel="stylesheet" href="styles.css">
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-analytics.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"></script>
 </head>
 <body>
     <div class="container">
@@ -17,29 +12,18 @@
         <div class="video-container">
             <div class="webcam-frame">
                 <video id="local-video" autoplay playsinline></video>
-                <div id="local-video-text" class="webcam-text">Váš obraz</div>
+                <div class="webcam-text">Váš obraz</div>
             </div>
             <div class="webcam-frame">
                 <video id="remote-video" autoplay playsinline></video>
-                <div id="remote-video-text" class="webcam-text">Pripojený účastník</div>
+                <div class="webcam-text">Vzdialený obraz</div>
             </div>
         </div>
         <div class="controls">
             <button id="start-call" class="control-button">Začať hovor</button>
             <button id="join-call" class="control-button">Pripojiť sa k hovoru</button>
-            <button id="mute-btn" class="control-button">
-                <i id="mute-icon" class="fas fa-microphone"></i>
-            </button>
-            <button id="camera-btn" class="control-button">
-                <i id="camera-icon" class="fas fa-video"></i>
-            </button>
-            <button id="hangup-btn" class="control-button red-background">
-                <i class="fas fa-phone-slash"></i>
-            </button>
         </div>
     </div>
-
-    <!-- JavaScript aplikácie -->
     <script src="app.js"></script>
 </body>
 </html>
