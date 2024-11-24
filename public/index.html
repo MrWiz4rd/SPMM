@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webkonferencia</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Webkonferencia</h1>
+        <div class="webcam-frame">
+            <video id="webcam" autoplay playsinline></video>
+            <div id="webcam-text" class="webcam-text">Tu bude výstup z kamery</div>
+        </div>
+        <div class="controls">
+            <!-- Tlačidlo mikrofónu -->
+            <button class="control-button green-background" id="mute-btn">
+                <i id="mute-icon" class="fas fa-microphone"></i>
+            </button>
+            <!-- Tlačidlo kamery -->
+            <button class="control-button green-background" id="camera-btn">
+                <i id="camera-icon" class="fas fa-video"></i>
+            </button>
+            <!-- Tlačidlo ukončenia hovoru -->
+            <div class="red-background">
+                <button class="control-button transparent-background" id="hangup-btn">
+                    <i class="fas fa-headphones white-icon"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
