@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webkonferencia</title>
+    <title>WebRTC Manual Signaling</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1 class="title">Webkonferencia</h1>
+        <h1 class="title">WebRTC Manual Signaling</h1>
+
         <div class="video-container">
             <div class="webcam-frame">
                 <video id="local-video" autoplay playsinline></video>
@@ -19,12 +20,19 @@
                 <div class="webcam-text">Vzdialený obraz</div>
             </div>
         </div>
+
         <div class="controls">
             <button id="start-call" class="control-button">Začať hovor</button>
             <button id="join-call" class="control-button">Pripojiť sa k hovoru</button>
         </div>
+
+        <div class="signaling">
+            <textarea id="local-offer" placeholder="Skopírujte tento offer a pošlite ho druhému účastníkovi"></textarea>
+            <textarea id="remote-offer" placeholder="Vložte remote offer od druhého účastníka"></textarea>
+            <button id="set-remote-offer">Nastaviť remote offer</button>
+        </div>
     </div>
-    <!-- Označenie app.js ako modul -->
-    <script type="module" src="app.js"></script>
+
+    <script src="app.js"></script>
 </body>
 </html>
