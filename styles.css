@@ -56,25 +56,30 @@ video {
     color: white;
     border: none;
     border-radius: 5px;
-    padding: 15px 20px;
+    width: 70px; /* Fixná šírka pre tlačidlá */
+    height: 70px; /* Fixná výška pre tlačidlá */
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin: 0 10px;
     cursor: pointer;
     font-size: 1.5em;
     transition: background-color 0.3s;
 }
 
-/* Štýly pre aktívne tlačidlá */
+/* Aktívny (zelený) stav */
 .control-button.active {
-    background-color: #45b3e7; /* Zelené pozadie */
+    background-color: #28a745; /* Zelené pozadie */
 }
 
-/* Štýly pre neaktívne tlačidlá */
+/* Neaktívny (červený) stav */
 .control-button.inactive {
-    background-color: red; /* Červené pozadie */
+    background-color: #dc3545; /* Červené pozadie */
 }
 
-.control-button:hover {
-    background-color: #218838; /* Tmavšie zelené pozadie pri hover */
+/* Odstránenie problému s posunom ikony */
+.control-button i {
+    line-height: 1; /* Zabezpečenie vertikálneho zarovnania ikony */
 }
 
 .red-background {
