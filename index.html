@@ -5,19 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webkonferencia</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- FontAwesome pre ikony -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-K6RqeWeci5ZR/Lv4MR0sA0F5YE6ls0sYDo0CZ76RUSjgI8V1xPY6z/6E4Xc1QyVZ" crossorigin="anonymous">
 </head>
 <body>
     <div class="container">
         <h1 class="title">Webkonferencia</h1>
 
-        <!-- Lokálne video -->
+        <!-- Lokálny video výstup -->
         <div class="webcam-frame">
             <video id="webcam" autoplay playsinline muted></video>
             <div id="webcam-text" class="webcam-text">Tu bude výstup z vašej kamery</div>
         </div>
 
-        <!-- Vzdialené video -->
+        <!-- Vzdialený video výstup -->
         <div class="webcam-frame">
             <video id="remote-webcam" autoplay playsinline></video>
             <div id="remote-webcam-text" class="webcam-text">Čaká sa na druhého používateľa...</div>
@@ -38,7 +39,5 @@
     </div>
 
     <!-- Skripty -->
+    <!-- Socket.io klientská knižnica -->
     <script src="/socket.io/socket.io.js"></script>
-    <script src="app.js"></script>
-</body>
-</html>
