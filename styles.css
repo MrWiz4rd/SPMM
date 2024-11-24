@@ -1,7 +1,8 @@
-/* Základné štýly stránky */
+/* Základné štýly */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: #212121;
+    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,12 +19,12 @@ body {
     margin-bottom: 20px;
 }
 
-/* Rám pre webkameru */
+/* Rám pre videá */
 .webcam-frame {
     width: 640px;
     height: 480px;
-    border: 5px solid #007bff;
-    margin: 0 auto 20px auto;
+    border: 3px solid #007bff;
+    margin: 10px auto;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -34,12 +35,13 @@ video {
     width: 100%;
     height: 100%;
     border-radius: 5px;
+    background-color: black;
 }
 
 .webcam-text {
     position: absolute;
-    color: black;
-    font-size: 1.5em;
+    color: white;
+    font-size: 1.2em;
     text-align: center;
     display: flex;
     justify-content: center;
@@ -53,13 +55,12 @@ video {
 .controls {
     display: flex;
     justify-content: center;
-    gap: 15px; /* Medzery medzi tlačidlami */
+    gap: 15px;
 }
 
-/* Základné tlačidlá */
 .control-button {
     border: none;
-    border-radius: 10%; /* Mierne zaoblenie */
+    border-radius: 50%;
     width: 70px;
     height: 70px;
     display: flex;
@@ -70,36 +71,17 @@ video {
     transition: background-color 0.3s, transform 0.2s;
 }
 
-/* Aktívne tlačidlo (mikrofón alebo kamera zapnuté) */
 .control-button.active {
-    background-color: #007bff; /* Svetlomodrá */
+    background-color: #007bff;
     color: white;
 }
 
-/* Neaktívne tlačidlo (mikrofón alebo kamera vypnuté) */
 .control-button.inactive {
-    background-color: #dc3545; /* Červená */
+    background-color: #dc3545;
     color: white;
 }
 
-/* Efekt pri prechode myšou - aktívne tlačidlo (zapnuté) */
-.control-button.active:hover {
-    background-color: #dc3545; /* Zmena na červenú pri hover */
+.control-button.red-background {
+    background-color: #dc3545;
+    color: white;
 }
-
-/* Efekt pri prechode myšou - neaktívne tlačidlo (vypnuté) */
-.control-button.inactive:hover {
-    background-color: #007bff; /* Zmena na modrú pri hover */
-}
-
-/* Štýl tlačidla na ukončenie hovoru */
-.red-background {
-    background-color: #dc3545; /* Červené pozadie */
-    border-radius: 10%; /* Mierne zaoblenie */
-    width: 70px;
-    height: 70px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
