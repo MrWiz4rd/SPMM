@@ -1,7 +1,3 @@
-// Importy potrebné pre Firebase verziu 9+
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-import { getDatabase, ref, set, onValue, push } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
-
 // Firebase konfigurácia
 const firebaseConfig = {
   apiKey: "AIzaSyAx6FWn6zc36lnMcnk8aYYH4FvCxcIrC6o",
@@ -13,14 +9,14 @@ const firebaseConfig = {
   measurementId: "G-2K3YFBQKGE"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+// Inicializácia Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
 
 // Referencie pre signalizáciu
-const offerRef = ref(database, '/offer');
-const answerRef = ref(database, '/answer');
-const candidatesRef = ref(database, '/candidates');
+const offerRef = database.ref('/offer');
+const answerRef = database.ref('/answer');
+const candidatesRef = database.ref('/candidates');
 
 // Výber prvkov z DOM
 const localVideo = document.getElementById('local-video');
@@ -43,7 +39,7 @@ const iceConfig = {
 navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     .then((stream) => {
         localStream = stream;
-        localVideo.srcObject = stream;
+        document.getElementById('local-video').srcObject = stream;
         setupButtons(); // Nastavenie funkcií tlačidiel po získaní streamu
     })
     .catch((error) => {
@@ -62,13 +58,13 @@ function initializePeerConnection() {
 
     // Prijatie vzdialených stôp
     peerConnection.ontrack = (event) => {
-        remoteVideo.srcObject = event.streams[0];
+        document.getElementById('remote-video').srcObject = event.streams[0];
     };
 
     // Odosielanie ICE kandidátov
     peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
-            push(candidatesRef, JSON.stringify(event.candidate));
+            candidatesRef.push(JSON.stringify(event.candidate));
         }
     };
 }
@@ -80,14 +76,14 @@ document.getElementById('start-call').addEventListener('click', () => {
     peerConnection.createOffer()
         .then((offer) => {
             peerConnection.setLocalDescription(offer);
-            set(offerRef, JSON.stringify(offer));
+            offerRef.set(JSON.stringify(offer));
         })
         .catch((error) => console.error('Chyba pri vytváraní ponuky:', error));
 });
 
 // Prijatie ponuky a vytvorenie odpovede
 document.getElementById('join-call').addEventListener('click', () => {
-    onValue(offerRef, (snapshot) => {
+    offerRef.on('value', (snapshot) => {
         const offer = snapshot.val();
         if (!offer) return;
 
@@ -97,24 +93,22 @@ document.getElementById('join-call').addEventListener('click', () => {
             .then(() => peerConnection.createAnswer())
             .then((answer) => {
                 peerConnection.setLocalDescription(answer);
-                set(answerRef, JSON.stringify(answer));
+                answerRef.set(JSON.stringify(answer));
             })
             .catch((error) => console.error('Chyba pri spracovaní ponuky:', error));
     });
 
-    onValue(answerRef, (snapshot) => {
+    answerRef.on('value', (snapshot) => {
         const answer = snapshot.val();
         if (!answer) return;
 
         peerConnection.setRemoteDescription(new RTCSessionDescription(JSON.parse(answer)));
     });
 
-    onValue(candidatesRef, (snapshot) => {
-        snapshot.forEach((childSnapshot) => {
-            const candidate = JSON.parse(childSnapshot.val());
-            peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
-                .catch((error) => console.error('Chyba pri pridávaní ICE kandidáta:', error));
-        });
+    candidatesRef.on('child_added', (snapshot) => {
+        const candidate = JSON.parse(snapshot.val());
+        peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+            .catch((error) => console.error('Chyba pri pridávaní ICE kandidáta:', error));
     });
 });
 
