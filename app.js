@@ -36,7 +36,6 @@ muteBtn.addEventListener('click', () => {
 
             // Zmena farby tlačidla
             muteBtn.classList.toggle('red-background');
-            muteBtn.classList.toggle('green-background');
         }
     }
 });
