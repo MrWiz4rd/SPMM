@@ -3,36 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebRTC Manual Signaling</title>
+    <title>Webkonferencia</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1 class="title">WebRTC Manual Signaling</h1>
-
-        <div class="video-container">
-            <div class="webcam-frame">
-                <video id="local-video" autoplay playsinline></video>
-                <div class="webcam-text">Váš obraz</div>
-            </div>
-            <div class="webcam-frame">
-                <video id="remote-video" autoplay playsinline></video>
-                <div class="webcam-text">Vzdialený obraz</div>
-            </div>
+        <h1 class="title">Webkonferencia</h1>
+        <div class="webcam-frame">
+            <video id="webcam" autoplay playsinline></video>
+            <div id="webcam-text" class="webcam-text">Tu bude výstup z kamery</div>
         </div>
-
         <div class="controls">
-            <button id="start-call" class="control-button">Začať hovor</button>
-            <button id="join-call" class="control-button">Pripojiť sa k hovoru</button>
-        </div>
-
-        <div class="signaling">
-            <textarea id="local-offer" placeholder="Skopírujte tento offer a pošlite ho druhému účastníkovi"></textarea>
-            <textarea id="remote-offer" placeholder="Vložte remote offer od druhého účastníka"></textarea>
-            <button id="set-remote-offer">Nastaviť remote offer</button>
+            <!-- Tlačidlo mikrofónu -->
+            <button class="control-button active" id="mute-btn">
+                <i id="mute-icon" class="fas fa-microphone"></i>
+            </button>
+            <!-- Tlačidlo kamery -->
+            <button class="control-button active" id="camera-btn">
+                <i id="camera-icon" class="fas fa-video"></i>
+            </button>
+            <!-- Tlačidlo ukončenia hovoru -->
+            <button class="control-button red-background" id="hangup-btn">
+                <i class="fas fa-phone-slash white-icon"></i>
+            </button>
         </div>
     </div>
-
+    <script src="/socket.io/socket.io.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
