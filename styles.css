@@ -50,6 +50,7 @@ video {
 .controls {
     display: flex;
     justify-content: center;
+    gap: 15px; /* Pridáme medzery medzi tlačidlá */
 }
 
 .control-button {
@@ -77,7 +78,7 @@ video {
     color: white;
 }
 
-/* Zmenšenie tlačidla na ukončenie hovoru */
+/* Tlačidlo na ukončenie hovoru */
 .red-background {
     border-radius: 10%; /* Mierne zaoblenie */
     width: 70px;       /* Rovnaká šírka ako ostatné tlačidlá */
