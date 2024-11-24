@@ -13,9 +13,9 @@ const firebaseConfig = {
   measurementId: "G-2K3YFBQKGE"
 };
 
-// Inicializácia Firebase aplikácie a databázy
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
+const analytics = getAnalytics(app);
 
 // Referencie pre signalizáciu
 const offerRef = ref(database, '/offer');
