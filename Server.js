@@ -6,21 +6,20 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-app.use(express.static('public')); // Pre Netlify, slúži súbory z 'public'
+// Slúži statické súbory (napr. HTML a CSS)
+app.use(express.static('public'));
 
 io.on('connection', (socket) => {
-    console.log('Nový používateľ pripojený');
+    console.log('Používateľ pripojený:', socket.id);
 
-    socket.on('ready', () => {
-        socket.broadcast.emit('ready');
-    });
-
+    // Po prijatí signalizačnej správy
     socket.on('signal', (data) => {
+        console.log('Signalizácia:', data);
         socket.broadcast.emit('signal', data);
     });
 
     socket.on('disconnect', () => {
-        console.log('Používateľ sa odpojil');
+        console.log('Používateľ odpojený:', socket.id);
     });
 });
 
