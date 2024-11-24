@@ -84,7 +84,7 @@ video {
 .red-background {
     background-color: red;
     border-radius: 5px;
-    padding: 15px;
+    padding: 10px;
     display: flex;
     justify-content: center;
 }
