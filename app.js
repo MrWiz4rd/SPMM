@@ -1,62 +1,91 @@
-// Výber tlačidiel
+const socket = io(); // Inicializácia socket.io
 const muteBtn = document.getElementById('mute-btn');
 const muteIcon = document.getElementById('mute-icon');
 const cameraBtn = document.getElementById('camera-btn');
 const cameraIcon = document.getElementById('camera-icon');
 const hangupBtn = document.getElementById('hangup-btn');
-
+const localVideo = document.getElementById('webcam');
+const remoteVideo = document.getElementById('remote-webcam');
 let localStream;
+let peerConnection;
+
+// WebRTC konfigurácia
+const config = {
+    iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' } // STUN server
+    ]
+};
+
+// Po pripojení k serveru
+socket.on('connect', () => {
+    console.log('Pripojený k serveru');
+});
+
+// Po prijatí signalizačnej správy
+socket.on('signal', async (data) => {
+    if (!peerConnection) createPeerConnection();
+
+    if (data.offer) {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        socket.emit('signal', { answer });
+    }
+
+    if (data.answer) {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+    }
+
+    if (data.candidate) {
+        await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+    }
+});
 
 // Získanie prístupu ku kamere a mikrofónu
 navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     .then((stream) => {
-        localStream = stream; // Uloženie streamu
-        document.getElementById('webcam').srcObject = stream; // Pripojenie streamu k video elementu
-        document.getElementById('webcam-text').style.display = 'none'; // Skrytie textu
+        localStream = stream;
+        localVideo.srcObject = stream;
+
+        // Pripojenie streamu k peerConnection
+        if (!peerConnection) createPeerConnection();
+        localStream.getTracks().forEach((track) => peerConnection.addTrack(track, localStream));
     })
     .catch((error) => {
         console.error('Chyba pri prístupe ku kamere alebo mikrofónu:', error);
         alert('Kamera alebo mikrofón neboli povolené.');
     });
 
-// Funkcia na prepínanie mikrofónu
-muteBtn.addEventListener('click', () => {
-    if (localStream) {
-        const audioTrack = localStream.getAudioTracks()[0];
-        if (audioTrack) {
-            audioTrack.enabled = !audioTrack.enabled; // Prepnutie stavu mikrofónu
+// Vytvorenie peerConnection
+function createPeerConnection() {
+    peerConnection = new RTCPeerConnection(config);
 
-            // Zmena ikony a stavu tlačidla
-            muteIcon.classList.toggle('fa-microphone', audioTrack.enabled);
-            muteIcon.classList.toggle('fa-microphone-slash', !audioTrack.enabled);
-            muteBtn.classList.toggle('inactive', !audioTrack.enabled); // Nastavenie červenej farby
-            muteBtn.classList.toggle('active', audioTrack.enabled);   // Nastavenie modrej farby
+    peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+            socket.emit('signal', { candidate: event.candidate });
         }
-    }
-});
+    };
 
-// Funkcia na prepínanie kamery
-cameraBtn.addEventListener('click', () => {
-    if (localStream) {
-        const videoTrack = localStream.getVideoTracks()[0];
-        if (videoTrack) {
-            videoTrack.enabled = !videoTrack.enabled; // Prepnutie stavu kamery
+    peerConnection.ontrack = (event) => {
+        remoteVideo.srcObject = event.streams[0];
+        document.getElementById('remote-webcam-text').style.display = 'none';
+    };
+}
 
-            // Zmena ikony a stavu tlačidla
-            cameraIcon.classList.toggle('fa-video', videoTrack.enabled);
-            cameraIcon.classList.toggle('fa-video-slash', !videoTrack.enabled);
-            cameraBtn.classList.toggle('inactive', !videoTrack.enabled); // Nastavenie červenej farby
-            cameraBtn.classList.toggle('active', videoTrack.enabled);   // Nastavenie modrej farby
-        }
-    }
-});
+// Iniciovanie hovoru
+socket.emit('ready');
 
-// Funkcia na ukončenie hovoru
+// Ukončenie hovoru
 hangupBtn.addEventListener('click', () => {
-    if (localStream) {
-        // Zastavenie všetkých stôp (tracks) streamu
-        localStream.getTracks().forEach((track) => track.stop());
-        document.getElementById('webcam').srcObject = null; // Odpojenie streamu
-        alert('Hovor bol ukončený.');
+    if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
     }
+    if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
+        localVideo.srcObject = null;
+    }
+    remoteVideo.srcObject = null;
+    alert('Hovor bol ukončený.');
+    socket.disconnect();
 });
