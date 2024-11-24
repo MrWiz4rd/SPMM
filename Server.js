@@ -1,25 +1,91 @@
-const WebSocket = require('ws');
+const socket = io(); // Inicializácia socket.io
+const muteBtn = document.getElementById('mute-btn');
+const muteIcon = document.getElementById('mute-icon');
+const cameraBtn = document.getElementById('camera-btn');
+const cameraIcon = document.getElementById('camera-icon');
+const hangupBtn = document.getElementById('hangup-btn');
+const localVideo = document.getElementById('webcam');
+const remoteVideo = document.getElementById('remote-webcam');
+let localStream;
+let peerConnection;
 
-const server = new WebSocket.Server({ port: 3000 });
+// WebRTC konfigurácia
+const config = {
+    iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' } // STUN server
+    ]
+};
 
-let clients = [];
-
-server.on('connection', (socket) => {
-    clients.push(socket);
-
-    socket.on('message', (message) => {
-        // Poslať správu všetkým ostatným klientom
-        clients.forEach((client) => {
-            if (client !== socket && client.readyState === WebSocket.OPEN) {
-                client.send(message);
-            }
-        });
-    });
-
-    socket.on('close', () => {
-        // Odstrániť klienta po odpojení
-        clients = clients.filter((client) => client !== socket);
-    });
+// Po pripojení k serveru
+socket.on('connect', () => {
+    console.log('Pripojený k serveru');
 });
 
-console.log('Signalizačný server beží na porte 3000');
+// Po prijatí signalizačnej správy
+socket.on('signal', async (data) => {
+    if (!peerConnection) createPeerConnection();
+
+    if (data.offer) {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        socket.emit('signal', { answer });
+    }
+
+    if (data.answer) {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+    }
+
+    if (data.candidate) {
+        await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+    }
+});
+
+// Získanie prístupu ku kamere a mikrofónu
+navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    .then((stream) => {
+        localStream = stream;
+        localVideo.srcObject = stream;
+
+        // Pripojenie streamu k peerConnection
+        if (!peerConnection) createPeerConnection();
+        localStream.getTracks().forEach((track) => peerConnection.addTrack(track, localStream));
+    })
+    .catch((error) => {
+        console.error('Chyba pri prístupe ku kamere alebo mikrofónu:', error);
+        alert('Kamera alebo mikrofón neboli povolené.');
+    });
+
+// Vytvorenie peerConnection
+function createPeerConnection() {
+    peerConnection = new RTCPeerConnection(config);
+
+    peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+            socket.emit('signal', { candidate: event.candidate });
+        }
+    };
+
+    peerConnection.ontrack = (event) => {
+        remoteVideo.srcObject = event.streams[0];
+        document.getElementById('remote-webcam-text').style.display = 'none';
+    };
+}
+
+// Iniciovanie hovoru
+socket.emit('ready');
+
+// Ukončenie hovoru
+hangupBtn.addEventListener('click', () => {
+    if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+    }
+    if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
+        localVideo.srcObject = null;
+    }
+    remoteVideo.srcObject = null;
+    alert('Hovor bol ukončený.');
+    socket.disconnect();
+});
