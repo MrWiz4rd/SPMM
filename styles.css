@@ -1,9 +1,11 @@
+/* Základné štýly stránky */
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column; /* Usporiadanie obsahu v stĺpci */
     height: 100vh;
     margin: 0;
 }
@@ -17,15 +19,25 @@ body {
     margin-bottom: 20px;
 }
 
-.webcam-frame {
-    width: 640px;
-    height: 480px;
-    border: 5px solid #007bff;
-    margin: 0 auto 20px auto;
+/* Kontajner pre videá */
+.video-container {
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 40px; /* Väčšia medzera medzi videami */
+    margin-bottom: 20px; /* Priestor medzi videami a tlačidlami */
+}
+
+/* Rám pre webkameru */
+.webcam-frame {
+    width: 480px; /* Zvýšená šírka okien */
+    height: 360px; /* Zvýšená výška okien */
+    border: 5px solid #007bff;
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
 }
 
 video {
@@ -36,7 +48,7 @@ video {
 
 .webcam-text {
     position: absolute;
-    color: black;
+    color: white;
     font-size: 1.5em;
     text-align: center;
     display: flex;
@@ -47,10 +59,12 @@ video {
     pointer-events: none;
 }
 
+/* Ovládacie tlačidlá */
 .controls {
     display: flex;
     justify-content: center;
-    gap: 15px; /* Medzery medzi tlačidlami */
+    gap: 20px; /* Väčšie medzery medzi tlačidlami */
+    margin-top: 20px; /* Posunutie tlačidiel nižšie */
 }
 
 .control-button {
@@ -80,10 +94,10 @@ video {
 
 /* Tlačidlo na ukončenie hovoru */
 .red-background {
+    background-color: #dc3545; /* Červené pozadie */
     border-radius: 10%; /* Mierne zaoblenie */
-    width: 70px;       /* Rovnaká šírka ako ostatné tlačidlá */
-    height: 70px;      /* Rovnaká výška ako ostatné tlačidlá */
-    background-color: #dc3545 !important; /* Červené pozadie s prioritou */
+    width: 70px;
+    height: 70px;
     display: flex;
     justify-content: center;
     align-items: center;
