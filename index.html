@@ -11,13 +11,13 @@
     <div class="container">
         <h1 class="title">Webkonferencia</h1>
 
-        <!-- Lokálny video výstup -->
+        <!-- Lokálne video -->
         <div class="webcam-frame">
             <video id="webcam" autoplay playsinline muted></video>
             <div id="webcam-text" class="webcam-text">Tu bude výstup z vašej kamery</div>
         </div>
 
-        <!-- Vzdialený video výstup -->
+        <!-- Vzdialené video -->
         <div class="webcam-frame">
             <video id="remote-webcam" autoplay playsinline></video>
             <div id="remote-webcam-text" class="webcam-text">Čaká sa na druhého používateľa...</div>
@@ -25,17 +25,20 @@
 
         <!-- Ovládacie tlačidlá -->
         <div class="controls">
-            <!-- Tlačidlo mikrofónu -->
             <button class="control-button active" id="mute-btn">
                 <i id="mute-icon" class="fas fa-microphone"></i>
             </button>
-            <!-- Tlačidlo kamery -->
             <button class="control-button active" id="camera-btn">
                 <i id="camera-icon" class="fas fa-video"></i>
             </button>
-            <!-- Tlačidlo ukončenia hovoru -->
             <button class="control-button red-background" id="hangup-btn">
                 <i class="fas fa-phone-slash white-icon"></i>
             </button>
         </div>
     </div>
+
+    <!-- Skripty -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
