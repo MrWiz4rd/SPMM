@@ -30,11 +30,13 @@ muteBtn.addEventListener('click', () => {
         if (audioTrack) {
             audioTrack.enabled = !audioTrack.enabled; // Prepnutie stavu mikrofónu
 
-            // Zmena ikony a stavu tlačidla
+            // Zmena ikony podľa stavu
             muteIcon.classList.toggle('fa-microphone');
             muteIcon.classList.toggle('fa-microphone-slash');
-            muteBtn.classList.toggle('active');
-            muteBtn.classList.toggle('inactive');
+
+            // Zmena farby tlačidla
+            muteBtn.classList.toggle('red-background');
+            muteBtn.classList.toggle('green-background');
         }
     }
 });
@@ -46,11 +48,12 @@ cameraBtn.addEventListener('click', () => {
         if (videoTrack) {
             videoTrack.enabled = !videoTrack.enabled; // Prepnutie stavu kamery
 
-            // Zmena ikony a stavu tlačidla
+            // Zmena ikony podľa stavu
             cameraIcon.classList.toggle('fa-video');
             cameraIcon.classList.toggle('fa-video-slash');
-            cameraBtn.classList.toggle('active');
-            cameraBtn.classList.toggle('inactive');
+
+            // Zmena farby tlačidla
+            cameraBtn.classList.toggle('red-background');
         }
     }
 });
