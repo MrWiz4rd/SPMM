@@ -10,20 +10,25 @@
 <body>
     <div class="container">
         <h1 class="title">Webkonferencia</h1>
-        <div class="webcam-frame">
-            <video id="webcam" autoplay playsinline></video>
-            <div id="webcam-text" class="webcam-text">Tu bude výstup z kamery</div>
+        <div class="video-container">
+            <!-- Video prvého používateľa -->
+            <div class="webcam-frame">
+                <video id="local-video" autoplay playsinline></video>
+                <div id="local-video-text" class="webcam-text">Váš obraz</div>
+            </div>
+            <!-- Video druhého používateľa -->
+            <div class="webcam-frame">
+                <video id="remote-video" autoplay playsinline></video>
+                <div id="remote-video-text" class="webcam-text">Pripojený účastník</div>
+            </div>
         </div>
         <div class="controls">
-            <!-- Tlačidlo mikrofónu -->
             <button class="control-button active" id="mute-btn">
                 <i id="mute-icon" class="fas fa-microphone"></i>
             </button>
-            <!-- Tlačidlo kamery -->
             <button class="control-button active" id="camera-btn">
                 <i id="camera-icon" class="fas fa-video"></i>
             </button>
-            <!-- Tlačidlo ukončenia hovoru -->
             <button class="control-button red-background" id="hangup-btn">
                 <i class="fas fa-phone-slash white-icon"></i>
             </button>
