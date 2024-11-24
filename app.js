@@ -1,16 +1,18 @@
 // Firebase konfigurácia
 const firebaseConfig = {
-  apiKey: "AIzaSyAx6FWn6zc36lnMcnk8aYYH4FvCxcIrC6o",
-  authDomain: "spmm-a8fa5.firebaseapp.com",
-  projectId: "spmm-a8fa5",
-  storageBucket: "spmm-a8fa5.firebasestorage.app",
-  messagingSenderId: "962431433976",
-  appId: "1:962431433976:web:d66c57740a5675e5e58f0d",
-  measurementId: "G-2K3YFBQKGE"
+    apiKey: "AIzaSyAx6FWn6zc36lnMcnk8aYYH4FvCxcIrC6o",
+    authDomain: "spmm-a8fa5.firebaseapp.com",
+    databaseURL: "https://spmm-a8fa5.firebaseio.com",
+    projectId: "spmm-a8fa5",
+    storageBucket: "spmm-a8fa5.appspot.com",
+    messagingSenderId: "962431433976",
+    appId: "1:962431433976:web:d66c57740a5675e5e58f0d",
+    measurementId: "G-2K3YFBQKGE"
 };
 
 // Inicializácia Firebase
-firebase.initializeApp(firebaseConfig);
+const app = firebase.initializeApp(firebaseConfig);
+const analytics = firebase.analytics(app);
 const database = firebase.database();
 
 // Referencie pre signalizáciu
@@ -18,15 +20,7 @@ const offerRef = database.ref('/offer');
 const answerRef = database.ref('/answer');
 const candidatesRef = database.ref('/candidates');
 
-// Výber prvkov z DOM
-const localVideo = document.getElementById('local-video');
-const remoteVideo = document.getElementById('remote-video');
-const muteBtn = document.getElementById('mute-btn');
-const cameraBtn = document.getElementById('camera-btn');
-const hangupBtn = document.getElementById('hangup-btn');
-const muteIcon = document.getElementById('mute-icon');
-const cameraIcon = document.getElementById('camera-icon');
-
+// WebRTC logika
 let localStream;
 let peerConnection;
 
@@ -40,7 +34,7 @@ navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     .then((stream) => {
         localStream = stream;
         document.getElementById('local-video').srcObject = stream;
-        setupButtons(); // Nastavenie funkcií tlačidiel po získaní streamu
+        setupButtons();
     })
     .catch((error) => {
         console.error('Chyba pri prístupe ku kamere/mikrofónu:', error);
@@ -115,32 +109,24 @@ document.getElementById('join-call').addEventListener('click', () => {
 // Nastavenie funkcií tlačidiel
 function setupButtons() {
     // Prepínanie mikrofónu
-    muteBtn.addEventListener('click', () => {
+    document.getElementById('mute-btn').addEventListener('click', () => {
         const audioTrack = localStream.getAudioTracks()[0];
-        if (audioTrack) {
-            audioTrack.enabled = !audioTrack.enabled;
-            muteIcon.classList.toggle('fa-microphone-slash', !audioTrack.enabled);
-            muteIcon.classList.toggle('fa-microphone', audioTrack.enabled);
-        }
+        audioTrack.enabled = !audioTrack.enabled;
     });
 
     // Prepínanie kamery
-    cameraBtn.addEventListener('click', () => {
+    document.getElementById('camera-btn').addEventListener('click', () => {
         const videoTrack = localStream.getVideoTracks()[0];
-        if (videoTrack) {
-            videoTrack.enabled = !videoTrack.enabled;
-            cameraIcon.classList.toggle('fa-video-slash', !videoTrack.enabled);
-            cameraIcon.classList.toggle('fa-video', videoTrack.enabled);
-        }
+        videoTrack.enabled = !videoTrack.enabled;
     });
 
     // Ukončenie hovoru
-    hangupBtn.addEventListener('click', () => {
+    document.getElementById('hangup-btn').addEventListener('click', () => {
         if (localStream) {
             localStream.getTracks().forEach((track) => track.stop());
-            localVideo.srcObject = null;
-            remoteVideo.srcObject = null;
-            alert('Hovor bol ukončený.');
         }
+        document.getElementById('local-video').srcObject = null;
+        document.getElementById('remote-video').srcObject = null;
+        alert('Hovor bol ukončený.');
     });
 }
