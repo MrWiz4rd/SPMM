@@ -1,22 +1,41 @@
-<div class="container">
-    <h1 class="title">Webkonferencia</h1>
-    <div class="webcam-frame">
-        <video id="webcam" autoplay playsinline muted></video>
-        <div id="webcam-text" class="webcam-text">Tu bude výstup z vašej kamery</div>
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webkonferencia</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Webkonferencia</h1>
+
+        <!-- Lokálny video výstup -->
+        <div class="webcam-frame">
+            <video id="webcam" autoplay playsinline muted></video>
+            <div id="webcam-text" class="webcam-text">Tu bude výstup z vašej kamery</div>
+        </div>
+
+        <!-- Vzdialený video výstup -->
+        <div class="webcam-frame">
+            <video id="remote-webcam" autoplay playsinline></video>
+            <div id="remote-webcam-text" class="webcam-text">Čaká sa na druhého používateľa...</div>
+        </div>
+
+        <!-- Ovládacie tlačidlá -->
+        <div class="controls">
+            <!-- Tlačidlo mikrofónu -->
+            <button class="control-button active" id="mute-btn">
+                <i id="mute-icon" class="fas fa-microphone"></i>
+            </button>
+            <!-- Tlačidlo kamery -->
+            <button class="control-button active" id="camera-btn">
+                <i id="camera-icon" class="fas fa-video"></i>
+            </button>
+            <!-- Tlačidlo ukončenia hovoru -->
+            <button class="control-button red-background" id="hangup-btn">
+                <i class="fas fa-phone-slash white-icon"></i>
+            </button>
+        </div>
     </div>
-    <div class="webcam-frame">
-        <video id="remote-webcam" autoplay playsinline></video>
-        <div id="remote-webcam-text" class="webcam-text">Čaká sa na druhého používateľa...</div>
-    </div>
-    <div class="controls">
-        <button class="control-button active" id="mute-btn">
-            <i id="mute-icon" class="fas fa-microphone"></i>
-        </button>
-        <button class="control-button active" id="camera-btn">
-            <i id="camera-icon" class="fas fa-video"></i>
-        </button>
-        <button class="control-button red-background" id="hangup-btn">
-            <i class="fas fa-phone-slash white-icon"></i>
-        </button>
-    </div>
-</div>
