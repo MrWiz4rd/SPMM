@@ -7,10 +7,8 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Slúži statické súbory (HTML, CSS, obrázky)
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, '/')));
 
-// Slúži index.html pri GET požiadavke na koreň
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -18,9 +16,12 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
     console.log('Používateľ pripojený:', socket.id);
 
-    // Preposielanie signalizačných správ ostatným
+    socket.on('join', () => {
+        socket.broadcast.emit('ready'); // Informuje ostatných, že niekto sa pripojil
+    });
+
     socket.on('signal', (data) => {
-        console.log('Signalizácia od', socket.id);
+        console.log('Signalizácia:', data);
         socket.broadcast.emit('signal', data);
     });
 
@@ -30,4 +31,6 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server beží na porte ${PORT}`));
+server.listen(PORT, () => {
+    console.log(`Server beží na porte ${PORT}`);
+});
